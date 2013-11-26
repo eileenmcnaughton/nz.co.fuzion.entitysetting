@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Entitysetting</base>
+  <class>EntitySetting</class>
+  <name>civicrm_entity_setting</name>
+  <comment>Table containing entity settings</comment>
+  <add>4.4</add>
+  <log>true</log>
+
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique EntitySetting ID</comment>
+    <add>4.4</add>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+
+  <field>
+    <name>entity_id</name>
+    <type>int unsigned</type>
+    <add>4.4</add>
+  </field>
+
+  <field>
+    <name>entity_type</name>
+    <type>varchar</type>
+    <length>255</length>
+    <comment>Entity Type - camel Case</comment>
+    <add>4.4</add>
+  </field>
+
+  <field>
+    <name>setting_data</name>
+    <type>text</type>
+    <comment>Json Stored, Extension keyed array of data per entity</comment>
+    <add>4.4</add>
+  </field>
+</table>
