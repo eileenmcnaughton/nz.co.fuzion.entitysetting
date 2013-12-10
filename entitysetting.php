@@ -82,17 +82,21 @@ function entitysetting_civicrm_buildForm($formName, &$form ) {
   $formSettings = array();
   foreach ($settings as $setting) {
     if(!empty($setting['add_to_setting_form'])) {
+      $formKey = CRM_Entitysetting_BAO_EntitySetting::getKey($setting);
       $options = CRM_Entitysetting_BAO_EntitySetting::getOptions($setting);
        foreach ($options as $key => &$value) {
         // specifically 'from_email' has quotes that cause probs
         $value = str_replace(array('"', '<', '>'), ' ', $value);
       }
       $form->addElement($setting['html_type'],
-        CRM_Entitysetting_BAO_EntitySetting::getKey($setting),
+        $formKey,
         ts($setting['title']),
         $options
      );
-      $formSettings[] = CRM_Entitysetting_BAO_EntitySetting::getKey($setting);
+      if(($entity_id = $form->get('id')) != FALSE) {
+        _entity_civicrm_set_form_defaults($form, $setting, $entity_id, $formKey);
+      }
+      $formSettings[] = $formKey;
     }
   }
   $form->assign('entitySettings', $formSettings);
@@ -180,3 +184,19 @@ function _entitysetting_civicrm_get_form_settings($formName) {
   return $settings['values'];
 }
 
+
+function _entity_civicrm_set_form_defaults(&$form, $setting, $entity_id, $formKey) {
+  try{
+    $default = civicrm_api3('entity_setting', 'get', array(
+        'key' => $setting['key'],
+        'name' => $setting['name'],
+        'entity_type' => $setting['entity'],
+        'entity_id' => $entity_id,
+    ));
+
+    $form->setDefaults(array($formKey => $default['values'][$setting['name']]));
+  }
+  catch(Exception $e) {
+    // don't set the default
+  }
+}
