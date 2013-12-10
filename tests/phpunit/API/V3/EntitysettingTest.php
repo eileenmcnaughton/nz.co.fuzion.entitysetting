@@ -5,7 +5,7 @@ require_once 'CiviTest/CiviUnitTestCase.php';
 /**
  * FIXME
  */
-class API_V3_EntitysettingTest extends CiviUnitTestCase {
+class api_v3_EntitySettingTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $_params = array();
   protected $ids = array();

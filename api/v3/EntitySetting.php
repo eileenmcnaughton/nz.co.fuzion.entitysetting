@@ -72,3 +72,27 @@ function _civicrm_api3_entity_setting_get_spec(&$spec) {
       'title' => 'Setting NameSpace - You pass the settings for one key'
   );
 }
+
+/**
+ * EntitySetting.get API
+ *
+ * @param array $params
+ * @return array API result descriptor
+ * @throws API_Exception
+ */
+function civicrm_api3_entity_setting_getsettings($params) {
+  $settings = CRM_Entitysetting_BAO_EntitySetting::getSettings($params);
+  return civicrm_api3_create_success($settings);
+}
+
+/**
+ * EntitySetting.getSettings API specification
+ * This is used for documentation and validation.
+ *
+ * @param array $spec description of fields supported by this API call
+ * @return void
+ * @see http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+ */
+function _civicrm_api3_entity_setting_getsettings_spec(&$spec) {
+  $spec['entity']['api.required'] = 1;
+}
