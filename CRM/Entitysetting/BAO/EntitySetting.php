@@ -135,7 +135,7 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
           $params['labelColumn'] = 'name';
         }
         // Call our generic fn for retrieving from the option_value table
-        return CRM_Core_OptionGroup::values(
+        $options = CRM_Core_OptionGroup::values(
           $pseudoconstant['optionGroupName'],
           $flip,
           $params['grouping'],
@@ -146,6 +146,17 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
           $params['fresh'],
           $params['keyColumn'] ? $params['keyColumn'] : 'value'
         );
+         //@todo - this part is not in the core function - allows over-riding of domain-specificity
+         // note that only 2 option values are probably affected- from_email_address & grant_types
+        if(!empty($fieldSpec['pseudoconstant']['all_domains'])) {
+          $allOptions = civicrm_api3('option_value', 'get', array('option_group_name' => $pseudoconstant['optionGroupName']));
+          foreach ($allOptions['values'] as $values) {
+            if(empty($options[$values['value']])) {
+              $options[$values['value']] = $values['label'];
+            }
+          }
+        }
+        return $options;
       }
     }
   }
