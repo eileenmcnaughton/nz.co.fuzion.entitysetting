@@ -1,0 +1,12 @@
+{foreach from=$entitySettings key=setting item=settingspec}
+  {assign var='helpid' value='id-'|cat:$setting}
+  {assign var='helpidtitle' value='id-'|cat:$setting|cat:'-title'}
+  {if $settingspec.help_text}
+    {htxt id=$helpidtitle}
+      {ts}{$settingspec.title}{/ts}
+    {/htxt}
+    {htxt id=$helpid}
+      {ts}{$settingspec.help_text}{/ts}
+    {/htxt}
+  {/if}
+{/foreach}

@@ -19,7 +19,12 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
     $params['setting_data'] = array($params['key'] => $params['settings']);
 
     if($instance->setting_data) {
-      $params['setting_data'] = array_merge(json_decode($instance->setting_data, TRUE), $params['setting_data']);
+      $originalSettingData = json_decode($instance->setting_data, TRUE);
+      foreach ($params['setting_data'] as $key => $newSettings) {
+        if(is_array($originalSettingData[$key])) {
+          $params['setting_data'][$key] = array_merge($originalSettingData[$key], $newSettings);
+        }
+      }
     }
     if(is_array($params['setting_data'])) {
       $params['setting_data'] = json_encode($params['setting_data']);
@@ -85,10 +90,13 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
 
 /**
  * get settings for entity
+ * @param array $params
+ *  - entity = required
+ * @return array settings for given entity
  */
   static function getSettings($params) {
     $settings = self::getSettingSpecification($params['entity']);
-    return $settings[$params['entity']];
+    return CRM_Utils_Array::value($params['entity'], $settings, array());
   }
 
   /**
@@ -158,6 +166,18 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
         }
         return $options;
       }
+    }
+  }
+
+  /**
+   * We are removing specific html that we know causes problems in the form - identified
+   * issue is the 'from_email' field that breaks html with use of < & >
+   * @param array $options
+   */
+  static function sanitiseOptions(&$options) {
+    foreach ($options as $key => &$value) {
+      // specifically 'from_email' has quotes that cause probs
+      $value = str_replace(array('"', '<', '>'), ' ', $value);
     }
   }
 

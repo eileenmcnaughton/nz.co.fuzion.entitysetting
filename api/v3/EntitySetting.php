@@ -68,8 +68,8 @@ function _civicrm_api3_entity_setting_get_spec(&$spec) {
   $spec['entity_id']['api.required'] = 1;
   $spec['entity_type']['api.required'] = 1;
   $spec['key'] = array(
-      'api.required' => TRUE,
-      'title' => 'Setting NameSpace - You pass the settings for one key'
+    'api.required' => TRUE,
+    'title' => 'Setting NameSpace - You pass the settings for one key'
   );
 }
 

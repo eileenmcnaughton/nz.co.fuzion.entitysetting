@@ -73,33 +73,31 @@ function entitysetting_civicrm_managed(&$entities) {
  * Implementation of hook_civicrm_buildForm
  *
  * Add entity setting config to admin forms
+ * @param string $formName name of form
+ * @param object $form form object
  */
 function entitysetting_civicrm_buildForm($formName, &$form ) {
   if(!_entitysetting_civicrm_is_admin_form_configured($formName)) {
     return;
   }
   $settings = _entitysetting_civicrm_get_form_settings($formName);
-  $formSettings = array();
-  foreach ($settings as $setting) {
-    if(!empty($setting['add_to_setting_form'])) {
-      $formKey = CRM_Entitysetting_BAO_EntitySetting::getKey($setting);
-      $options = CRM_Entitysetting_BAO_EntitySetting::getOptions($setting);
-       foreach ($options as $key => &$value) {
-        // specifically 'from_email' has quotes that cause probs
-        $value = str_replace(array('"', '<', '>'), ' ', $value);
-      }
-      $form->addElement($setting['html_type'],
-        $formKey,
-        ts($setting['title']),
-        $options
-     );
-      if(($entity_id = $form->get('id')) != FALSE) {
-        _entity_civicrm_set_form_defaults($form, $setting, $entity_id, $formKey);
-      }
-      $formSettings[] = $formKey;
+
+  foreach ($settings as $formKey => $setting) {
+    $options = CRM_Entitysetting_BAO_EntitySetting::getOptions($setting);
+    if($options) {
+      CRM_Entitysetting_BAO_EntitySetting::sanitiseOptions($options);
+    }
+
+    $form->addElement($setting['html_type'],
+      $formKey,
+      ts($setting['title']),
+      $options
+    );
+    if(($entity_id = $form->get('id')) != FALSE) {
+      _entity_civicrm_set_form_defaults($form, $setting, $entity_id, $formKey);
     }
   }
-  $form->assign('entitySettings', $formSettings);
+  $form->assign('entitySettings', $settings);
 }
 
 /**
@@ -118,12 +116,31 @@ function entitysetting_civicrm_alterContent(&$content, $context, $tplName, &$obj
     return;
   }
   $settings = _entitysetting_civicrm_get_form_settings($formName);
+  if(empty($settings)) {
+    return;
+  }
+
   $doc = new DOMDocument();
   $doc->loadHTML($content);
+  // note that forms are inconsistent as to which items have ids so we have append to,
+  // insert before & even insert before before
   foreach ($settings as $setting) {
     if(!empty($setting['add_to_setting_form'])) {
-      $wrapper = $doc->getElementById($setting['form_child_of_id']);
-      if($wrapper) {
+      if(!empty($setting['form_child_of_id'])) {
+        $wrapper = $doc->getElementById($setting['form_child_of_id']);
+      }
+      elseif (!empty($setting['form_child_of_parent'])) {
+        //check it exists to avoid warning
+        if($doc->getElementById($setting['form_child_of_parents_parent'])) {
+          $wrapper = $doc->getElementById($setting['form_child_of_parents_parent'])->parentNode;
+        }
+      }
+      elseif (!empty($setting['form_child_of_parents_parent'])) {
+        if($doc->getElementById($setting['form_child_of_parents_parent'])) {
+          $wrapper = $doc->getElementById($setting['form_child_of_parents_parent'])->parentNode->parentNode;
+        }
+      }
+      if(isset($wrapper)) { // we need this if for submit
         $wrapper->appendChild($doc->getElementById('entity-setting-' . CRM_Entitysetting_BAO_EntitySetting::getKey($setting)));
       }
     }
@@ -155,13 +172,45 @@ function entitysetting_civicrm_postProcess($formName, &$form ) {
 }
 
 /**
+ * implements pageRun hook
+ * Assign form settings to help page
+ * @param unknown $page
+ */
+function entitysetting_civicrm_pageRun(&$page) {
+  $pageName = get_class($page);
+  if($pageName != 'CRM_Core_Page_Inline_Help') {
+    return;
+  }
+  $pageClass = str_replace('/', '_', $_REQUEST['file']);
+  if(!_entitysetting_civicrm_is_admin_form_configured($pageClass)) {
+    return;
+  }
+  $settings = _entitysetting_civicrm_get_form_settings($pageClass);
+  CRM_Core_Smarty::singleton()->assign('entitySettings', $settings);
+}
+
+/**
  *
  */
 function _entitysetting_civicrm_get_entity_form_mappings() {
   return array(
     'CRM_Admin_Form_ScheduleReminders' => 'action_schedule',
     'CRM_Admin_Page_ScheduleReminders' => 'action_schedule',
+    'CRM_Admin_Form_RelationshipType' => 'relationship_type',
+    'CRM_Admin_Page_RelationshipType' => 'relationship_type',
+    'CRM_Contribute_Form_ContributionPage_Settings' => 'contribution_page',
+    'CRM_Event_Form_ManageEvent_EventInfo' => 'event',
+    'CRM_Event_Form_ManageEvent_Registration' => 'event',
+
   );
+}
+
+/**
+ * Assign relevant setting values to form
+ * @param unknown $form
+ */
+function _entitysetting_assign_form_settings(&$form) {
+
 }
 /**
  *
@@ -175,13 +224,27 @@ function _entitysetting_civicrm_is_admin_form_configured($formName) {
 
 /**
  *
- * @param unknown $formName
- * @return boolean
+ * Get array of settings to be added to the form
+ * @param string $formName Name of form
+ * @return array
  */
 function _entitysetting_civicrm_get_form_settings($formName) {
   $adminForms = _entitysetting_civicrm_get_entity_form_mappings();
+  if(empty($adminForms[$formName])) {
+    return;
+  }
   $settings = civicrm_api3('entity_setting', 'getsettings', array('entity' => $adminForms[$formName]));
-  return $settings['values'];
+  if(empty($settings['values'])) {
+    return array();
+  }
+  $formSettings = array();
+  foreach ($settings['values'] as $key => $setting) {
+    $formKey = CRM_Entitysetting_BAO_EntitySetting::getKey($setting);
+    if(!empty($setting['add_to_setting_form'])) {
+      $formSettings[$formKey] = $setting;
+    }
+  }
+  return $formSettings;
 }
 
 
@@ -193,7 +256,6 @@ function _entity_civicrm_set_form_defaults(&$form, $setting, $entity_id, $formKe
       'entity_type' => $setting['entity'],
       'entity_id' => $entity_id,
     ));
-
     $form->setDefaults(array($formKey => $default['values'][$setting['name']]));
   }
   catch(Exception $e) {
