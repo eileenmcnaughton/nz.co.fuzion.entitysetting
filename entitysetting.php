@@ -124,6 +124,8 @@ function entitysetting_civicrm_alterContent(&$content, $context, $tplName, &$obj
   $doc->loadHTML($content);
   // note that forms are inconsistent as to which items have ids so we have append to,
   // insert before & even insert before before
+  //@todo - we need to rationalise this - but first figuring out the various possibilities
+  // would be better it all table rows had an id - & all tables - but not sure if that is right approach
   foreach ($settings as $setting) {
     if(!empty($setting['add_to_setting_form'])) {
       if(!empty($setting['form_child_of_id'])) {
@@ -131,8 +133,8 @@ function entitysetting_civicrm_alterContent(&$content, $context, $tplName, &$obj
       }
       elseif (!empty($setting['form_child_of_parent'])) {
         //check it exists to avoid warning
-        if($doc->getElementById($setting['form_child_of_parents_parent'])) {
-          $wrapper = $doc->getElementById($setting['form_child_of_parents_parent'])->parentNode;
+        if($doc->getElementById($setting['form_child_of_parent'])) {
+          $wrapper = $doc->getElementById($setting['form_child_of_parent'])->parentNode;
         }
       }
       elseif (!empty($setting['form_child_of_parents_parent'])) {
@@ -140,7 +142,12 @@ function entitysetting_civicrm_alterContent(&$content, $context, $tplName, &$obj
           $wrapper = $doc->getElementById($setting['form_child_of_parents_parent'])->parentNode->parentNode;
         }
       }
-      if(isset($wrapper)) { // we need this if for submit
+      elseif (!empty($setting['form_child_of_parents_parents_parent'])) {
+        if($doc->getElementById($setting['form_child_of_parents_parents_parent'])) {
+          $wrapper = $doc->getElementById($setting['form_child_of_parents_parents_parent'])->parentNode->parentNode->parentNode;
+        }
+      }
+      if(!empty($wrapper)) { // we need this if for submit
         $wrapper->appendChild($doc->getElementById('entity-setting-' . CRM_Entitysetting_BAO_EntitySetting::getKey($setting)));
       }
     }

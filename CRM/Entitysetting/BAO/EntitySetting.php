@@ -167,6 +167,13 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
         return $options;
       }
     }
+    elseif(!empty($fieldSpec['options_callback'])) {
+      $options = call_user_func_array(array($fieldSpec['options_callback']['class'], $fieldSpec['options_callback']['method']), $fieldSpec['options_callback']['arguments']);
+      if(!isset($options['']) && empty($fieldSpec['required'])) {
+        $options = array_merge(array('' => '--' . ts('select') . '--'), $options);
+      }
+      return $options;
+    }
   }
 
   /**
