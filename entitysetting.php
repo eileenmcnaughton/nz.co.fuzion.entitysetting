@@ -263,7 +263,7 @@ function _entity_civicrm_set_form_defaults(&$form, $setting, $entity_id, $formKe
       'entity_type' => $setting['entity'],
       'entity_id' => $entity_id,
     ));
-    $form->setDefaults(array($formKey => $default['values'][$setting['name']]));
+    $form->setDefaults(array($formKey => $default['values'][$entity_id][$setting['name']]));
   }
   catch(Exception $e) {
     // don't set the default

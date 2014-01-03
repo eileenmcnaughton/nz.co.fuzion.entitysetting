@@ -16,15 +16,17 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
     $instance->entity_id = $params['entity_id'];
     $instance->entity_type = $params['entity_type'];
     $instance->find(TRUE);
-    $params['setting_data'] = array($params['key'] => $params['settings']);
+    $params['setting_data'] = is_null($params['settings']) ? array() : array($params['key'] => $params['settings']);
 
     if($instance->setting_data) {
       $originalSettingData = json_decode($instance->setting_data, TRUE);
+      $untouchedSettings = array_diff_key($originalSettingData, array_merge(array($params['key'] => 1), $params['setting_data']));
       foreach ($params['setting_data'] as $key => $newSettings) {
-        if(is_array($originalSettingData[$key])) {
+        if(isset($originalSettingData[$key]) && is_array($originalSettingData[$key])) {
           $params['setting_data'][$key] = array_merge($originalSettingData[$key], $newSettings);
         }
       }
+      $params['setting_data'] = $params['setting_data'] + $untouchedSettings;
     }
     if(is_array($params['setting_data'])) {
       $params['setting_data'] = json_encode($params['setting_data']);
@@ -190,6 +192,11 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
 
   static function getKey($settingSpec) {
     return str_replace('.', '-', $settingSpec['key'] . '__' . $settingSpec['name']);
+  }
+
+  static function del($params) {
+    $params['settings'] = NULL;
+    self::create($params);
   }
 }
 

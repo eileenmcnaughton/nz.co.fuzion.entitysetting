@@ -9,6 +9,12 @@
     <email>eileen@fuzion.co.nz</email>
   </maintainer>
   <releaseDate>2013-11-15</releaseDate>
+  <urls>
+    <url desc="Main Extension Page">http://civicrm.org</url>
+    <url desc="Support">http://forum.civicrm.org</url>
+    <url desc="Licensing">http://civicrm.org/licensing</url>
+    <url desc="Documentation">https://github.com/eileenmcnaughton/nz.co.fuzion.entitysetting/blob/master/README.md</url>
+  </urls>
   <version>1.0</version>
   <develStage>alpha</develStage>
   <compatibility>
