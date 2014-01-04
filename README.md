@@ -30,10 +30,11 @@ To use this extension within another extension you need to
 1) declare your settings. This should be done in a file page YourExtensionRoot/settings/uniquefilename.entity_setting.php
 see below for specification for the declaration
 
-2) register your path - use a function like this
+2) register your path - use a function like below
 
-3)
+3) empty your cache (civicrm_cache)... whenever you change your declaration
 
+**********Path registration function *******************
 /**
  * Implementation of entity setting hook_civicrm_alterEntitySettingsFolders
  * declare folders with entity settings

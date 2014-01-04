@@ -96,6 +96,36 @@ function _civicrm_api3_entity_setting_get_spec(&$spec) {
  * @return array API result descriptor
  * @throws API_Exception
  */
+function civicrm_api3_entity_setting_getsingle($params) {
+  $settings = civicrm_api3_entity_setting_get($params);
+  if(empty($settings['values'][$params['entity_id']])) {
+    throw new API_Exception("Expected one result found " . count($settings['values']));
+  }
+  return $settings['values'][$params['entity_id']];
+}
+
+/**
+ * EntitySetting.get API
+ *
+ * @param array $params
+ * @return array API result descriptor
+ * @throws API_Exception
+ */
+function civicrm_api3_entity_setting_getvalue($params) {
+  $settings = civicrm_api3_entity_setting_getsingle($params);
+  if(empty($settings[$params['name']])) {
+    throw new API_Exception("Setting {$params['name']} not found");
+  }
+  return $settings[$params['name']];
+}
+
+/**
+ * EntitySetting.get API
+ *
+ * @param array $params
+ * @return array API result descriptor
+ * @throws API_Exception
+ */
 function civicrm_api3_entity_setting_getsettings($params) {
   $settings = CRM_Entitysetting_BAO_EntitySetting::getSettings($params);
   return civicrm_api3_create_success($settings);

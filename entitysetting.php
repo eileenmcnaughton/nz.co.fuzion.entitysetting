@@ -257,13 +257,13 @@ function _entitysetting_civicrm_get_form_settings($formName) {
 
 function _entity_civicrm_set_form_defaults(&$form, $setting, $entity_id, $formKey) {
   try{
-    $default = civicrm_api3('entity_setting', 'get', array(
+    $default = civicrm_api3('entity_setting', 'getvalue', array(
       'key' => $setting['key'],
       'name' => $setting['name'],
       'entity_type' => $setting['entity'],
       'entity_id' => $entity_id,
     ));
-    $form->setDefaults(array($formKey => $default['values'][$entity_id][$setting['name']]));
+    $form->setDefaults(array($formKey => $default));
   }
   catch(Exception $e) {
     // don't set the default
