@@ -159,7 +159,10 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
          //@todo - this part is not in the core function - allows over-riding of domain-specificity
          // note that only 2 option values are probably affected- from_email_address & grant_types
         if(!empty($fieldSpec['pseudoconstant']['all_domains'])) {
-          $allOptions = civicrm_api3('option_value', 'get', array('option_group_name' => $pseudoconstant['optionGroupName']));
+          $allOptions = civicrm_api3('option_value', 'get', array(
+            'option_group_name' => $pseudoconstant['optionGroupName'],
+            'options' => array('limit' => 500),
+          ));
           foreach ($allOptions['values'] as $values) {
             if(empty($options[$values['value']])) {
               $options[$values['value']] = $values['label'];
