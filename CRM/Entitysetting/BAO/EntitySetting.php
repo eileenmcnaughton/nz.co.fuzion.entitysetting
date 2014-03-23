@@ -105,10 +105,21 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
    *
    */
   static function hookAlterEntitySettingsFolders(&$metaDataFolders) {
-    return CRM_Utils_Hook::singleton()->invoke(1, $metaDataFolders,
+    $codeVersion = explode('.', CRM_Utils_System::version());
+    // if db.ver < code.ver, time to upgrade
+    if (version_compare($codeVersion[0] . '.' . $codeVersion[1], 4.5) >= 0) {
+      return CRM_Utils_Hook::singleton()->invoke(1, $metaDataFolders,
+        self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+        self::$_nullObject,
+        'civicrm_alterEntitySettingsFolders'
+      );
+    }
+    else {
+      return CRM_Utils_Hook::singleton()->invoke(1, $metaDataFolders,
         self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
         'civicrm_alterEntitySettingsFolders'
-    );
+      );
+    }
   }
   /**
    * shortcut to preferably being able to use core pseudoconstant fn
