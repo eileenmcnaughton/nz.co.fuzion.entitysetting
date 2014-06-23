@@ -119,9 +119,10 @@ function entitysetting_civicrm_alterContent(&$content, $context, $tplName, &$obj
   if(empty($settings)) {
     return;
   }
-
+  libxml_use_internal_errors(true);
   $doc = new DOMDocument();
   $doc->loadHTML($content);
+  libxml_clear_errors();
   // note that forms are inconsistent as to which items have ids so we have append to,
   // insert before & even insert before before
   //@todo - we need to rationalise this - but first figuring out the various possibilities
