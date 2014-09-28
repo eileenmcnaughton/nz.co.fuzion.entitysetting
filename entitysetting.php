@@ -105,7 +105,7 @@ function entitysetting_civicrm_buildForm($formName, &$form ) {
  *
  * We move the items to the right place here - this is very painful! but it is only on admin forms
  * Think how nice it would be if civi gave us an array!
- * @param unknown $content
+ * @param CRM_Core_Form $content
  * @param unknown $context
  * @param unknown $tplName
  * @param unknown $object
@@ -222,7 +222,7 @@ function _entitysetting_assign_form_settings(&$form) {
 }
 /**
  *
- * @param unknown $formName
+ * @param string $formName
  * @return boolean
  */
 function _entitysetting_civicrm_is_admin_form_configured($formName) {
