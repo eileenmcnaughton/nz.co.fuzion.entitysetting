@@ -169,13 +169,16 @@ function entitysetting_civicrm_postProcess($formName, &$form ) {
   $submitVars = $form->controller->exportValues($form->get('_name'));
   $settings = _entitysetting_civicrm_get_form_settings($formName);
   foreach ($settings as $setting) {
-    //@todo - we aren't handling multiple settings by one extension well here
+    $settingKey = CRM_Entitysetting_BAO_EntitySetting::getKey($setting);
+    $settingValue = isset($submitVars[$settingKey]) ? $submitVars[$settingKey] : NULL;
+    //@todo - we aren't handling multiple settings by one extension well here as we are
+    // setting them each individually rather than combining into one array first
     civicrm_api3('entity_setting', 'create', array(
       'entity_id' => $entityID,
       'entity_type' => $setting['entity'],
-      'settings' => array($setting['name'] => $submitVars[CRM_Entitysetting_BAO_EntitySetting::getKey($setting)]),
+      'settings' => array($setting['name'] => $settingValue),
       'key' => $setting['key'],
-    ));
+     ));
   }
 }
 
