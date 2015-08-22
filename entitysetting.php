@@ -112,6 +112,9 @@ function entitysetting_civicrm_buildForm($formName, &$form ) {
  */
 function entitysetting_civicrm_alterContent(&$content, $context, $tplName, &$object) {
   $formName = get_class($object);
+  if (!in_array($object->getVar('_action'), array(CRM_Core_Action::ADD, CRM_Core_Action::UPDATE))) {
+    return;
+  }
   if(!_entitysetting_civicrm_is_admin_form_configured($formName)) {
     return;
   }
