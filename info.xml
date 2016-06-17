@@ -21,6 +21,8 @@
     <ver>4.2</ver>
     <ver>4.4</ver>
     <ver>4.5</ver>
+    <ver>4.6</ver>
+    <ver>4.7</ver>
   </compatibility>
   <comments>This extension is provided to be a 'soft' dependency for other extension. It does not provide functionality itself</comments>
   <civix>

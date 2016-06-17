@@ -276,3 +276,18 @@ function _entity_civicrm_set_form_defaults(&$form, $setting, $entity_id, $formKe
     // don't set the default
   }
 }
+
+/**
+ * Implements hook_civicrm_entityTypes.
+ *
+ * @param array $entityTypes
+ *   Registered entity types.
+ */
+function entitysetting_civicrm_entityTypes(&$entityTypes) {
+  $entityTypes['CRM_Entitysetting_DAO_EntitySetting'] = array(
+    'name' => 'EntitySetting',
+    'class' => 'CRM_Entitysetting_DAO_EntitySetting',
+    'table' => 'civicrm_entity_setting',
+  );
+
+}
