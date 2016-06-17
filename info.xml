@@ -15,8 +15,8 @@
     <url desc="Licensing">http://civicrm.org/licensing</url>
     <url desc="Documentation">https://github.com/eileenmcnaughton/nz.co.fuzion.entitysetting/blob/master/README.md</url>
   </urls>
-  <version>1.1</version>
-  <develStage>alpha</develStage>
+  <version>1.2</version>
+  <develStage>stable</develStage>
   <compatibility>
     <ver>4.2</ver>
     <ver>4.4</ver>
