@@ -215,6 +215,7 @@ function _entitysetting_civicrm_get_entity_form_mappings() {
     'CRM_Contribute_Form_ContributionPage_Settings' => 'contribution_page',
     'CRM_Event_Form_ManageEvent_EventInfo' => 'event',
     'CRM_Event_Form_ManageEvent_Registration' => 'event',
+    'CRM_Event_Form_ManageEvent_Fee' => 'event_fee',
 
   );
 }
