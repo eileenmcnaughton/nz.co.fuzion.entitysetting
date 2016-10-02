@@ -124,7 +124,7 @@ function entitysetting_civicrm_alterContent(&$content, $context, $tplName, &$obj
   }
   libxml_use_internal_errors(true);
   $doc = new DOMDocument();
-  $doc->loadHTML($content);
+  $doc->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'));
   libxml_clear_errors();
   // note that forms are inconsistent as to which items have ids so we have append to,
   // insert before & even insert before before
@@ -156,7 +156,9 @@ function entitysetting_civicrm_alterContent(&$content, $context, $tplName, &$obj
       }
     }
   }
-  $content = $doc->saveHTML();
+  $content = '<div id="crm-container" class="crm-container">';
+  $content .= $doc->saveHTML();
+  $content .= '</div>';
 }
 /**
  * Implementation of hook_civicrm_buildForm
