@@ -35,6 +35,7 @@ see below for specification for the declaration
 3) empty your cache (civicrm_cache)... whenever you change your declaration
 
 **********Path registration function *******************
+```php
 /**
  * Implementation of entity setting hook_civicrm_alterEntitySettingsFolders
  * declare folders with entity settings
@@ -51,12 +52,14 @@ function hook_civicrm_alterEntitySettingsFolders(&$folders) {
     $folders[] = $extDir;
   }
 }
+```
 
 Setting Spec
 --------------
 
 This example declares 2 settings
 
+```php
 <?php
 
 return array (
@@ -93,6 +96,7 @@ return array (
     'required' => FALSE,
   ),
 );
+```
 
 -- key - unique key of your extension
 -- entity - name of entity
@@ -113,6 +117,5 @@ return array (
      & crawl up one .. use this
 -- form_child_of_parents_parent - but then it turned out not all trs had an id - so down one more & crawl up 2
 -- form_child_of_parents_parents_parent  OK - this is pretty bad. We started to hit the situation of <table><tr><td><input id='blah'>
-     and yes - if I really felt like the above would cover all the permutations I would rationalise & refactor but I'm still getting the
-     feel of all the variations as to what does & doesn't get ids on it. A later release may alter these (if you are using this
-     extension make yourself heard because it will affect how much backward compatility is maintained in any change)
+
+And yes - if I really felt like the above would cover all the permutations I would rationalise & refactor but I'm still getting the feel of all the variations as to what does & doesn't get ids on it. A later release may alter these (if you are using this extension make yourself heard because it will affect how much backward compatility is maintained in any change).
