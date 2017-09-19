@@ -83,7 +83,12 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
       $metaDataFolders = $metadata = array();
       self::hookAlterEntitySettingsFolders($metaDataFolders);
       foreach ($metaDataFolders as $metaDataFolder) {
-        $metadata = $metadata + self::loadMetaData($metaDataFolder, $entity);
+        $extensionMetaData = self::loadMetaData($metaDataFolder, $entity);
+        foreach ($extensionMetaData as $entitySetting => $setting) {
+          if ($entitySetting == $entity) {
+            $metadata[$entity][] = $setting[0];
+          }
+        }
       }
       CRM_Core_BAO_Cache::setItem($metadata, 'CiviCRM Entity setting Specs', $entity);
     }
