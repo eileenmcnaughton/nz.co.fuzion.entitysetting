@@ -197,7 +197,7 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
     }
     elseif(!empty($fieldSpec['options_callback'])) {
       $options = call_user_func_array(array($fieldSpec['options_callback']['class'], $fieldSpec['options_callback']['method']), $fieldSpec['options_callback']['arguments']);
-      if(!isset($options['']) && empty($fieldSpec['required'])) {
+      if(!isset($options['']) && empty($fieldSpec['required']) && $fieldSpec['html_type'] != 'Radio') {
         $options = array_merge(array('' => '--' . ts('select') . '--'), $options);
       }
       return $options;
