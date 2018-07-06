@@ -137,7 +137,7 @@ function civicrm_api3_entity_setting_getsingle($params) {
  */
 function civicrm_api3_entity_setting_getvalue($params) {
   $settings = civicrm_api3_entity_setting_getsingle($params);
-  if(empty($settings[$params['name']])) {
+  if(!isset($settings[$params['name']])) {
     throw new API_Exception("Setting {$params['name']} not found");
   }
   return $settings[$params['name']];
