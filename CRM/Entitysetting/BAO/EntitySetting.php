@@ -137,7 +137,7 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
    * shortcut to preferably being able to use core pseudoconstant fn
    * @todo - this is copy & paste from the pseudoconstant fn - would prefer to extract & re-use
    */
-  static function getoptions($fieldSpec, $params = array(), $context = NULL) {
+  static function getOptions($fieldSpec, $params = array(), $context = NULL) {
     $flip = !empty($params['flip']);
     // Merge params with defaults
     $params += array(
