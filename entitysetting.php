@@ -88,11 +88,16 @@ function entitysetting_civicrm_buildForm($formName, &$form ) {
       CRM_Entitysetting_BAO_EntitySetting::sanitiseOptions($options);
     }
 
-    $form->addElement($setting['html_type'],
-      $formKey,
-      ts($setting['title']),
-      $options
-    );
+    if ($setting['html_type'] == 'Radio') {
+      $form->addRadio($formKey, ts($setting['title']), $options, array('allowClear' => TRUE));
+    }
+    else {
+      $form->addElement($setting['html_type'],
+        $formKey,
+        ts($setting['title']),
+        $options
+      );
+    }
     if(($entity_id = $form->get('id')) != FALSE) {
       _entity_civicrm_set_form_defaults($form, $setting, $entity_id, $formKey);
     }
