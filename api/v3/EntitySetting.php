@@ -11,13 +11,13 @@
 function _civicrm_api3_entity_setting_create_spec(&$spec) {
   $spec['entity_id']['api.required'] = 1;
   $spec['entity_type']['api.required'] = 1;
-  $spec['settings'] = array(
+  $spec['settings'] = [
    'title' => 'Settings Data',
-  );
-  $spec['key'] = array(
+  ];
+  $spec['key'] = [
     'api.required' => TRUE,
     'title' => 'Setting NameSpace - You pass the settings for one key'
-  );
+  ];
 }
 
 /**
@@ -52,10 +52,10 @@ function civicrm_api3_entity_setting_delete($params) {
 function _civicrm_api3_entity_setting_delete_spec(&$spec) {
   $spec['entity_id']['api.required'] = 1;
   $spec['entity_type']['api.required'] = 1;
-  $spec['key'] = array(
+  $spec['key'] = [
     'api.required' => TRUE,
     'title' => 'Setting NameSpace - You pass the settings for one key'
-  );
+  ];
   unset($spec['id']);
 }
 /**
@@ -69,7 +69,7 @@ function civicrm_api3_entity_setting_get($params) {
   $settings = _civicrm_api3_basic_get('CRM_Entitysetting_BAO_EntitySetting', $params, FALSE);
   $settings = reset($settings);
   $settings = json_decode($settings['setting_data'], TRUE);
-  return civicrm_api3_create_success(array($params['entity_id'] => CRM_Utils_Array::value($params['key'], $settings, array())));
+  return civicrm_api3_create_success([$params['entity_id'] => CRM_Utils_Array::value($params['key'], $settings, [])]);
 }
 
 /**
@@ -83,10 +83,10 @@ function civicrm_api3_entity_setting_get($params) {
 function _civicrm_api3_entity_setting_get_spec(&$spec) {
   $spec['entity_id']['api.required'] = 1;
   $spec['entity_type']['api.required'] = 1;
-  $spec['key'] = array(
+  $spec['key'] = [
     'api.required' => TRUE,
     'title' => 'Setting NameSpace - You pass the settings for one key'
-  );
+  ];
 }
 
 /**

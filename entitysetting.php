@@ -22,28 +22,28 @@ function entitysetting_civicrm_xmlMenu(&$files) {
  * Implementation of hook_civicrm_install
  */
 function entitysetting_civicrm_install() {
-  return _entitysetting_civix_civicrm_install();
+  _entitysetting_civix_civicrm_install();
 }
 
 /**
  * Implementation of hook_civicrm_uninstall
  */
 function entitysetting_civicrm_uninstall() {
-  return _entitysetting_civix_civicrm_uninstall();
+  _entitysetting_civix_civicrm_uninstall();
 }
 
 /**
  * Implementation of hook_civicrm_enable
  */
 function entitysetting_civicrm_enable() {
-  return _entitysetting_civix_civicrm_enable();
+  _entitysetting_civix_civicrm_enable();
 }
 
 /**
  * Implementation of hook_civicrm_disable
  */
 function entitysetting_civicrm_disable() {
-  return _entitysetting_civix_civicrm_disable();
+  _entitysetting_civix_civicrm_disable();
 }
 
 /**
@@ -56,7 +56,7 @@ function entitysetting_civicrm_disable() {
  *                for 'enqueue', returns void
  */
 function entitysetting_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
-  return _entitysetting_civix_civicrm_upgrade($op, $queue);
+  _entitysetting_civix_civicrm_upgrade($op, $queue);
 }
 
 /**
@@ -66,7 +66,7 @@ function entitysetting_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
  * is installed, disabled, uninstalled.
  */
 function entitysetting_civicrm_managed(&$entities) {
-  return _entitysetting_civix_civicrm_managed($entities);
+  _entitysetting_civix_civicrm_managed($entities);
 }
 
 /**
@@ -89,7 +89,7 @@ function entitysetting_civicrm_buildForm($formName, &$form ) {
     }
 
     if ($setting['html_type'] == 'Radio') {
-      $form->addRadio($formKey, ts($setting['title']), $options, array('allowClear' => TRUE));
+      $form->addRadio($formKey, ts($setting['title']), $options, ['allowClear' => TRUE]);
     }
     else {
       $form->addElement($setting['html_type'],
@@ -110,14 +110,10 @@ function entitysetting_civicrm_buildForm($formName, &$form ) {
  *
  * We move the items to the right place here - this is very painful! but it is only on admin forms
  * Think how nice it would be if civi gave us an array!
- * @param CRM_Core_Form $content
- * @param unknown $context
- * @param unknown $tplName
- * @param unknown $object
  */
 function entitysetting_civicrm_alterContent(&$content, $context, $tplName, &$object) {
   $formName = get_class($object);
-  if (!in_array($object->getVar('_action'), array(CRM_Core_Action::ADD, CRM_Core_Action::UPDATE))) {
+  if (!in_array($object->getVar('_action'), [CRM_Core_Action::ADD, CRM_Core_Action::UPDATE])) {
     return;
   }
   if(!_entitysetting_civicrm_is_admin_form_configured($formName)) {
@@ -165,6 +161,7 @@ function entitysetting_civicrm_alterContent(&$content, $context, $tplName, &$obj
   $content .= $doc->saveHTML();
   $content .= '</div>';
 }
+
 /**
  * Implementation of hook_civicrm_buildForm
  *
@@ -183,12 +180,12 @@ function entitysetting_civicrm_postProcess($formName, &$form ) {
     $settingValue = isset($submitVars[$settingKey]) ? $submitVars[$settingKey] : NULL;
     //@todo - we aren't handling multiple settings by one extension well here as we are
     // setting them each individually rather than combining into one array first
-    civicrm_api3('entity_setting', 'create', array(
+    civicrm_api3('entity_setting', 'create', [
       'entity_id' => $entityID,
       'entity_type' => $setting['entity'],
-      'settings' => array($setting['name'] => $settingValue),
+      'settings' => [$setting['name'] => $settingValue],
       'key' => $setting['key'],
-     ));
+    ]);
   }
 }
 
@@ -214,7 +211,7 @@ function entitysetting_civicrm_pageRun(&$page) {
  *
  */
 function _entitysetting_civicrm_get_entity_form_mappings() {
-  return array(
+  return [
     'CRM_Admin_Form_ScheduleReminders' => 'action_schedule',
     'CRM_Admin_Page_ScheduleReminders' => 'action_schedule',
     'CRM_Admin_Form_RelationshipType' => 'relationship_type',
@@ -224,18 +221,18 @@ function _entitysetting_civicrm_get_entity_form_mappings() {
     'CRM_Event_Form_ManageEvent_Registration' => 'event',
     'CRM_Event_Form_ManageEvent_Fee' => 'event_fee',
 
-  );
+  ];
 }
 
 /**
  * Assign relevant setting values to form
- * @param unknown $form
+ * @param \CRM_Core_Form $form
  */
 function _entitysetting_assign_form_settings(&$form) {
 
 }
+
 /**
- *
  * @param string $formName
  * @return boolean
  */
@@ -245,21 +242,23 @@ function _entitysetting_civicrm_is_admin_form_configured($formName) {
 }
 
 /**
- *
  * Get array of settings to be added to the form
+ *
  * @param string $formName Name of form
+ *
  * @return array
+ * @throws \CiviCRM_API3_Exception
  */
 function _entitysetting_civicrm_get_form_settings($formName) {
   $adminForms = _entitysetting_civicrm_get_entity_form_mappings();
   if(empty($adminForms[$formName])) {
-    return;
+    return [];
   }
-  $settings = civicrm_api3('entity_setting', 'getsettings', array('entity' => $adminForms[$formName]));
+  $settings = civicrm_api3('entity_setting', 'getsettings', ['entity' => $adminForms[$formName]]);
   if(empty($settings['values'])) {
-    return array();
+    return [];
   }
-  $formSettings = array();
+  $formSettings = [];
   foreach ($settings['values'] as $key => $setting) {
     $formKey = CRM_Entitysetting_BAO_EntitySetting::getKey($setting);
     if(!empty($setting['add_to_setting_form'])) {
@@ -272,13 +271,13 @@ function _entitysetting_civicrm_get_form_settings($formName) {
 
 function _entity_civicrm_set_form_defaults(&$form, $setting, $entity_id, $formKey) {
   try{
-    $default = civicrm_api3('entity_setting', 'getvalue', array(
+    $default = civicrm_api3('entity_setting', 'getvalue', [
       'key' => $setting['key'],
       'name' => $setting['name'],
       'entity_type' => $setting['entity'],
       'entity_id' => $entity_id,
-    ));
-    $form->setDefaults(array($formKey => $default));
+    ]);
+    $form->setDefaults([$formKey => $default]);
   }
   catch(Exception $e) {
     // don't set the default
@@ -292,10 +291,9 @@ function _entity_civicrm_set_form_defaults(&$form, $setting, $entity_id, $formKe
  *   Registered entity types.
  */
 function entitysetting_civicrm_entityTypes(&$entityTypes) {
-  $entityTypes['CRM_Entitysetting_DAO_EntitySetting'] = array(
+  $entityTypes['CRM_Entitysetting_DAO_EntitySetting'] = [
     'name' => 'EntitySetting',
     'class' => 'CRM_Entitysetting_DAO_EntitySetting',
     'table' => 'civicrm_entity_setting',
-  );
-
+  ];
 }

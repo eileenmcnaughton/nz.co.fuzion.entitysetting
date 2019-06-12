@@ -16,11 +16,11 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
     $instance->entity_id = $params['entity_id'];
     $instance->entity_type = $params['entity_type'];
     $instance->find(TRUE);
-    $params['setting_data'] = is_null($params['settings']) ? array() : array($params['key'] => $params['settings']);
+    $params['setting_data'] = is_null($params['settings']) ? [] : [$params['key'] => $params['settings']];
 
     if($instance->setting_data) {
       $originalSettingData = json_decode($instance->setting_data, TRUE);
-      $untouchedSettings = array_diff_key($originalSettingData, array_merge(array($params['key'] => 1), $params['setting_data']));
+      $untouchedSettings = array_diff_key($originalSettingData, array_merge([$params['key'] => 1], $params['setting_data']));
       foreach ($params['setting_data'] as $key => $newSettings) {
         if(isset($originalSettingData[$key]) && is_array($originalSettingData[$key])) {
           $params['setting_data'][$key] = array_merge($originalSettingData[$key], $newSettings);
@@ -44,8 +44,8 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
   /**
    * Load up settings metadata from files
    */
-  static function loadMetadata($metaDataFolder) {
-    $settingMetaData = $entitySettings = array();
+  public static function loadMetadata($metaDataFolder) {
+    $settingMetaData = $entitySettings = [];
     $settingsFiles = CRM_Utils_File::findFiles($metaDataFolder, '*.entity_setting.php');
     foreach ($settingsFiles as $file) {
       $settings = include $file;
@@ -54,7 +54,7 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
       }
     }
     foreach ($entitySettings as $entity => $entitySetting) {
-      CRM_Core_BAO_Cache::setItem($entitySetting,'CiviCRM setting Spec', $entity);
+      \Civi::cache('settings')->set("entitysettings_{$entity}", $entitySetting);
     }
     return $entitySettings;
   }
@@ -77,10 +77,10 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
    * - description
    * - help_text
    */
-  static function getSettingSpecification($entity, $key = '', $force = 0) {
-    $metadata = CRM_Core_BAO_Cache::getItem('CiviCRM Entity setting Specs', $entity);
+  public static function getSettingSpecification($entity, $key = '', $force = 0) {
+    $metadata = \Civi::cache('settings')->get("entitysettings_{$entity}");
     if ($metadata === NULL || $force) {
-      $metaDataFolders = $metadata = array();
+      $metaDataFolders = $metadata = [];
       self::hookAlterEntitySettingsFolders($metaDataFolders);
       foreach ($metaDataFolders as $metaDataFolder) {
         $extensionMetaData = self::loadMetaData($metaDataFolder, $entity);
@@ -97,7 +97,7 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
           }
         }
       }
-      CRM_Core_BAO_Cache::setItem($metadata, 'CiviCRM Entity setting Specs', $entity);
+      \Civi::cache('settings')->set("entitysettings_{$entity}", $metadata);
     }
     return $metadata;
   }
@@ -108,44 +108,35 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
  *  - entity = required
  * @return array settings for given entity
  */
-  static function getSettings($params) {
+  public static function getSettings($params) {
     $settings = self::getSettingSpecification($params['entity']);
-    return CRM_Utils_Array::value($params['entity'], $settings, array());
+    return CRM_Utils_Array::value($params['entity'], $settings, []);
   }
 
   /**
    *
    */
-  static function hookAlterEntitySettingsFolders(&$metaDataFolders) {
-    $codeVersion = explode('.', CRM_Utils_System::version());
-    // if db.ver < code.ver, time to upgrade
-    if (version_compare($codeVersion[0] . '.' . $codeVersion[1], 4.5) >= 0) {
-      return CRM_Utils_Hook::singleton()->invoke(1, $metaDataFolders,
+  public static function hookAlterEntitySettingsFolders(&$metaDataFolders) {
+    return CRM_Utils_Hook::singleton()->invoke(1, $metaDataFolders,
         self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
         self::$_nullObject,
         'civicrm_alterEntitySettingsFolders'
       );
-    }
-    else {
-      return CRM_Utils_Hook::singleton()->invoke(1, $metaDataFolders,
-        self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
-        'civicrm_alterEntitySettingsFolders'
-      );
-    }
   }
+
   /**
    * shortcut to preferably being able to use core pseudoconstant fn
    * @todo - this is copy & paste from the pseudoconstant fn - would prefer to extract & re-use
    */
-  static function getOptions($fieldSpec, $params = array(), $context = NULL) {
+  public static function getOptions($fieldSpec, $params = [], $context = NULL) {
     $flip = !empty($params['flip']);
     // Merge params with defaults
-    $params += array(
+    $params += [
       'grouping' => FALSE,
       'localize' => FALSE,
       'onlyActive' => ($context == 'validate' || $context == 'get') ? FALSE : TRUE,
       'fresh' => FALSE,
-    );
+    ];
     if (isset($fieldSpec['enumValues'])) {
       // use of a space after the comma is inconsistent in xml
       $enumStr = str_replace(', ', ',', $fieldSpec['enumValues']);
@@ -156,11 +147,11 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
     elseif (!empty($fieldSpec['pseudoconstant'])) {
       $pseudoconstant = $fieldSpec['pseudoconstant'];
       // Merge params with schema defaults
-      $params += array(
-        'condition' => CRM_Utils_Array::value('condition', $pseudoconstant, array()),
+      $params += [
+        'condition' => CRM_Utils_Array::value('condition', $pseudoconstant, []),
         'keyColumn' => CRM_Utils_Array::value('keyColumn', $pseudoconstant),
         'labelColumn' => CRM_Utils_Array::value('labelColumn', $pseudoconstant),
-      );
+      ];
 
       // Fetch option group from option_value table
       if(!empty($pseudoconstant['optionGroupName'])) {
@@ -182,10 +173,10 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
          //@todo - this part is not in the core function - allows over-riding of domain-specificity
          // note that only 2 option values are probably affected- from_email_address & grant_types
         if(!empty($fieldSpec['pseudoconstant']['all_domains'])) {
-          $allOptions = civicrm_api3('option_value', 'get', array(
+          $allOptions = civicrm_api3('option_value', 'get', [
             'option_group_name' => $pseudoconstant['optionGroupName'],
-            'options' => array('limit' => 500),
-          ));
+            'options' => ['limit' => 500],
+          ]);
           foreach ($allOptions['values'] as $values) {
             if(empty($options[$values['value']])) {
               $options[$values['value']] = $values['label'];
@@ -196,9 +187,9 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
       }
     }
     elseif(!empty($fieldSpec['options_callback'])) {
-      $options = call_user_func_array(array($fieldSpec['options_callback']['class'], $fieldSpec['options_callback']['method']), $fieldSpec['options_callback']['arguments']);
+      $options = call_user_func_array([$fieldSpec['options_callback']['class'], $fieldSpec['options_callback']['method']], $fieldSpec['options_callback']['arguments']);
       if(!isset($options['']) && empty($fieldSpec['required']) && $fieldSpec['html_type'] != 'Radio') {
-        $options = array_merge(array('' => '--' . ts('select') . '--'), $options);
+        $options = array_merge(['' => '--' . ts('select') . '--'], $options);
       }
       return $options;
     }
@@ -209,18 +200,18 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
    * issue is the 'from_email' field that breaks html with use of < & >
    * @param array $options
    */
-  static function sanitiseOptions(&$options) {
+  public static function sanitiseOptions(&$options) {
     foreach ($options as $key => &$value) {
       // specifically 'from_email' has quotes that cause probs
-      $value = str_replace(array('"', '<', '>'), ' ', $value);
+      $value = str_replace(['"', '<', '>'], ' ', $value);
     }
   }
 
-  static function getKey($settingSpec) {
+  public static function getKey($settingSpec) {
     return str_replace('.', '-', $settingSpec['key'] . '__' . $settingSpec['name']);
   }
 
-  static function del($params) {
+  public static function del($params) {
     $params['settings'] = NULL;
     self::create($params);
   }

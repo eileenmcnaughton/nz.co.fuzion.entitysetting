@@ -7,18 +7,18 @@ require_once 'CiviTest/CiviUnitTestCase.php';
  */
 class api_v3_EntitySettingTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
-  protected $_params = array();
-  protected $ids = array();
+  protected $_params = [];
+  protected $ids = [];
   protected $_entity = 'entity_setting';
   public $_eNoticeCompliant = TRUE;
 
   function setUp() {
-    $this->_params = array(
+    $this->_params = [
       'entity_id' => 1,
       'entity_type' => 'Relationship',
       'key' => 'test_key',
-      'settings' => array('test_setting' => array(1,2,3,4), 'another_setting' => 'Monster'),
-    );
+      'settings' => ['test_setting' => [1,2,3,4], 'another_setting' => 'Monster'],
+    ];
     //$this->quickCleanup(array('civicrm_entity_setting'));
     parent::setUp();
   }
@@ -38,11 +38,11 @@ class api_v3_EntitySettingTest extends CiviUnitTestCase {
    */
   function testGet() {
     $this->callAPISuccess($this->_entity, 'create', $this->_params);
-    $result = $this->callAPIAndDocument($this->_entity, 'get', array(
+    $result = $this->callAPIAndDocument($this->_entity, 'get', [
       'entity_type' => 'relationship',
       'entity_id' => 1,
       'key' => 'test_key',
-    ), __FUNCTION__, __FILE__);
+    ], __FUNCTION__, __FILE__);
     foreach($this->_params['settings'] as $key => $setting) {
       $this->assertEquals($setting, $result['values'][1][$key]);
     }
