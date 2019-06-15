@@ -86,13 +86,8 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
         $extensionMetaData = self::loadMetaData($metaDataFolder, $entity);
         foreach ($extensionMetaData as $entitySetting => $setting) {
           if ($entitySetting == $entity) {
-            if (count($setting) > 1) {
-              foreach ($setting as $set) {
-                $metadata[$entity][] = $set;
-              }
-            }
-            else {
-              $metadata[$entity][] = $setting[0];
+            foreach ($setting as $set) {
+              $metadata[$entity][] = $set;
             }
           }
         }
