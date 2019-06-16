@@ -53,9 +53,6 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
         $entitySettings[$setting['entity']][] = $setting;
       }
     }
-    foreach ($entitySettings as $entity => $entitySetting) {
-      \Civi::cache('settings')->set("entitysettings_{$entity}", $entitySetting);
-    }
     return $entitySettings;
   }
 
@@ -92,7 +89,9 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
           }
         }
       }
-      \Civi::cache('settings')->set("entitysettings_{$entity}", $metadata);
+      if (!empty($metadata)) {
+        \Civi::cache('settings')->set("entitysettings_{$entity}", $metadata);
+      }
     }
     return $metadata;
   }
