@@ -4,11 +4,11 @@
  * *
  */
 function entity_setting_get_example(){
-$params = array(
+$params = [
   'entity_type' => 'relationship',
   'entity_id' => 1,
   'key' => 'test_key',
-);
+];
 
 try{
   $result = civicrm_api3('entity_setting', 'get', $params);
@@ -18,7 +18,7 @@ catch (CiviCRM_API3_Exception $e) {
   $errorMessage = $e->getMessage();
   $errorCode = $e->getErrorCode();
   $errorData = $e->getExtraParams();
-  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
+  return ['error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData];
 }
 
 return $result;
@@ -29,23 +29,23 @@ return $result;
  */
 function entity_setting_get_expectedresult(){
 
-  $expectedResult = array(
+  $expectedResult = [
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
   'id' => 1,
-  'values' => array(
-      '1' => array(
-          'test_setting' => array(
+  'values' => [
+      '1' => [
+          'test_setting' => [
               '0' => '1',
               '1' => '2',
               '2' => '3',
               '3' => '4',
-            ),
+          ],
           'another_setting' => 'Monster',
-        ),
-    ),
-);
+      ],
+  ],
+  ];
 
   return $expectedResult;
 }

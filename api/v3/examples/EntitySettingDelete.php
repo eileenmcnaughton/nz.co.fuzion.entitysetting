@@ -4,11 +4,11 @@
  * at this stage only deleting a whole key is supported *
  */
 function entity_setting_delete_example(){
-$params = array(
+$params = [
   'entity_id' => 1,
   'entity_type' => 'Relationship',
   'key' => 'test_key',
-);
+];
 
 try{
   $result = civicrm_api3('entity_setting', 'delete', $params);
@@ -18,7 +18,7 @@ catch (CiviCRM_API3_Exception $e) {
   $errorMessage = $e->getMessage();
   $errorCode = $e->getErrorCode();
   $errorData = $e->getExtraParams();
-  return array('error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData);
+  return ['error' => $errorMessage, 'error_code' => $errorCode, 'error_data' => $errorData];
 }
 
 return $result;
@@ -29,12 +29,12 @@ return $result;
  */
 function entity_setting_delete_expectedresult(){
 
-  $expectedResult = array(
+  $expectedResult = [
   'is_error' => 0,
   'version' => 3,
   'count' => 0,
   'values' => '',
-);
+  ];
 
   return $expectedResult;
 }
