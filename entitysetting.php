@@ -1,5 +1,6 @@
 <?php
 
+require_once __DIR__ . '/vendor/autoload.php';
 require_once 'entitysetting.civix.php';
 
 /**
@@ -124,7 +125,7 @@ function entitysetting_civicrm_alterContent(&$content, $context, $tplName, &$obj
     return;
   }
   libxml_use_internal_errors(true);
-  $doc = new DOMDocument();
+  $doc = new IvoPetkov\HTML5DOMDocument();
   $doc->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'));
   libxml_clear_errors();
   // note that forms are inconsistent as to which items have ids so we have append to,
