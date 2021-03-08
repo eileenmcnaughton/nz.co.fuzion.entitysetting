@@ -126,7 +126,7 @@ function entitysetting_civicrm_alterContent(&$content, $context, $tplName, &$obj
   }
   libxml_use_internal_errors(true);
   $doc = new IvoPetkov\HTML5DOMDocument();
-  $doc->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'));
+  $doc->loadHTML(mb_convert_encoding($content, 'HTML-ENTITIES', 'UTF-8'), IvoPetkov\HTML5DOMDocument::ALLOW_DUPLICATE_IDS);
   libxml_clear_errors();
   // note that forms are inconsistent as to which items have ids so we have append to,
   // insert before & even insert before before
