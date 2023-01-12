@@ -111,7 +111,7 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
    *
    */
   public static function hookAlterEntitySettingsFolders(&$metaDataFolders) {
-    return CRM_Utils_Hook::singleton()->invoke(1, $metaDataFolders,
+    return CRM_Utils_Hook::singleton()->invoke(['metaDataFolders'], $metaDataFolders,
         self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
         self::$_nullObject,
         'civicrm_alterEntitySettingsFolders'
