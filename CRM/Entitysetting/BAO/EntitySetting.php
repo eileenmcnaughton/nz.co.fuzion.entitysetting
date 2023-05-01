@@ -111,9 +111,10 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
    *
    */
   public static function hookAlterEntitySettingsFolders(&$metaDataFolders) {
-    return CRM_Utils_Hook::singleton()->invoke(1, $metaDataFolders,
-        self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
-        self::$_nullObject,
+    $null = NULL;
+    return CRM_Utils_Hook::singleton()->invoke(['metaDataFolders'], $metaDataFolders,
+        $null, $null, $null, $null,
+        $null,
         'civicrm_alterEntitySettingsFolders'
       );
   }
@@ -128,7 +129,7 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
     $params += [
       'grouping' => FALSE,
       'localize' => FALSE,
-      'onlyActive' => ($context == 'validate' || $context == 'get') ? FALSE : TRUE,
+      'onlyActive' => !(($context === 'validate' || $context === 'get')),
       'fresh' => FALSE,
     ];
     if (isset($fieldSpec['enumValues'])) {
