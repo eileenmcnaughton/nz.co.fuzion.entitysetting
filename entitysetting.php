@@ -11,15 +11,6 @@ function entitysetting_civicrm_config(&$config) {
 }
 
 /**
- * Implementation of hook_civicrm_xmlMenu
- *
- * @param $files array(string)
- */
-function entitysetting_civicrm_xmlMenu(&$files) {
-  _entitysetting_civix_civicrm_xmlMenu($files);
-}
-
-/**
  * Implementation of hook_civicrm_install
  */
 function entitysetting_civicrm_install() {
@@ -27,47 +18,10 @@ function entitysetting_civicrm_install() {
 }
 
 /**
- * Implementation of hook_civicrm_uninstall
- */
-function entitysetting_civicrm_uninstall() {
-  _entitysetting_civix_civicrm_uninstall();
-}
-
-/**
  * Implementation of hook_civicrm_enable
  */
 function entitysetting_civicrm_enable() {
   _entitysetting_civix_civicrm_enable();
-}
-
-/**
- * Implementation of hook_civicrm_disable
- */
-function entitysetting_civicrm_disable() {
-  _entitysetting_civix_civicrm_disable();
-}
-
-/**
- * Implementation of hook_civicrm_upgrade
- *
- * @param $op string, the type of operation being performed; 'check' or 'enqueue'
- * @param $queue CRM_Queue_Queue, (for 'enqueue') the modifiable list of pending up upgrade tasks
- *
- * @return mixed  based on op. for 'check', returns array(boolean) (TRUE if upgrades are pending)
- *                for 'enqueue', returns void
- */
-function entitysetting_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
-  _entitysetting_civix_civicrm_upgrade($op, $queue);
-}
-
-/**
- * Implementation of hook_civicrm_managed
- *
- * Generate a list of entities to create/deactivate/delete when this module
- * is installed, disabled, uninstalled.
- */
-function entitysetting_civicrm_managed(&$entities) {
-  _entitysetting_civix_civicrm_managed($entities);
 }
 
 /**
@@ -268,7 +222,6 @@ function _entitysetting_civicrm_get_form_settings($formName) {
   }
   return $formSettings;
 }
-
 
 function _entity_civicrm_set_form_defaults(&$form, $setting, $entity_id, $formKey) {
   try{

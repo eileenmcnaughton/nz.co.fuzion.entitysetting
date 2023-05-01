@@ -18,10 +18,20 @@
   <version>1.4</version>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>5.13</ver>
+    <ver>5.45</ver>
   </compatibility>
   <comments>This extension is provided to be a 'soft' dependency for other extension. It does not provide functionality itself</comments>
   <civix>
     <namespace>CRM/Entitysetting</namespace>
+    <format>23.02.1</format>
   </civix>
+  <classloader>
+    <psr0 prefix="CRM_" path="."/>
+    <psr4 prefix="Civi\" path="Civi"/>
+  </classloader>
+  <upgrader>CRM_Entitysetting_Upgrader</upgrader>
+  <mixins>
+    <mixin>smarty-v2@1.0.0</mixin>
+    <mixin>entity-types-php@1.0.0</mixin>
+  </mixins>
 </extension>
