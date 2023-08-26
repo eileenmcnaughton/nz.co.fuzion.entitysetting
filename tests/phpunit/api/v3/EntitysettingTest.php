@@ -52,7 +52,7 @@ class api_v3_EntitySettingTest extends \PHPUnit\Framework\TestCase implements He
   }
 
   public function testCreate(): void {
-    $result = $this->callAPIAndDocument($this->_entity, 'create', $this->_params, __FUNCTION__, __FILE__);
+    $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
   }
@@ -62,11 +62,11 @@ class api_v3_EntitySettingTest extends \PHPUnit\Framework\TestCase implements He
    */
   public function testGet(): void {
     $this->callAPISuccess($this->_entity, 'create', $this->_params);
-    $result = $this->callAPIAndDocument($this->_entity, 'get', [
+    $result = $this->callAPISuccess($this->_entity, 'get', [
       'entity_type' => 'relationship',
       'entity_id' => 1,
       'key' => 'test_key',
-    ], __FUNCTION__, __FILE__);
+    ]);
     foreach ($this->_params['settings'] as $key => $setting) {
       $this->assertEquals($setting, $result['values'][1][$key]);
     }
@@ -76,7 +76,6 @@ class api_v3_EntitySettingTest extends \PHPUnit\Framework\TestCase implements He
    * Test that we can delete a settings
    */
   public function testDelete(): void {
-    $description = 'at this stage only deleting a whole key is supported';
     $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $secondParams = $this->_params;
     $secondParams['key'] = 'second_key';
@@ -87,7 +86,7 @@ class api_v3_EntitySettingTest extends \PHPUnit\Framework\TestCase implements He
     $this->assertEquals('Monster', $result['values'][1]['another_setting']);
     $result = $this->callAPISuccess($this->_entity, 'get', $secondParams);
     $this->assertEquals('little angel', $result['values'][1]['another_setting']);
-    $this->callAPIAndDocument($this->_entity, 'delete', $this->_params, __FUNCTION__, __FILE__, $description);
+    $this->callAPISuccess($this->_entity, 'delete', $this->_params);
     $result = $this->callAPISuccess($this->_entity, 'get', $this->_params);
     $this->assertArrayNotHasKey('another_setting', $result['values'][1]);
     $this->callAPISuccess($this->_entity, 'delete', $secondParams);
