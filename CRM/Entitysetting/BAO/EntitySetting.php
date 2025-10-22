@@ -33,7 +33,7 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
     }
     $hook = empty($params['id']) ? 'create' : 'edit';
 
-    CRM_Utils_Hook::pre($hook, $entityName, CRM_Utils_Array::value('id', $params), $params);
+    CRM_Utils_Hook::pre($hook, $entityName, $params['id'] ?? NULL, $params);
     $instance->copyValues($params);
     $instance->save();
     CRM_Utils_Hook::post($hook, $entityName, $instance->id, $instance);
@@ -144,8 +144,8 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
       // Merge params with schema defaults
       $params += [
         'condition' => CRM_Utils_Array::value('condition', $pseudoconstant, []),
-        'keyColumn' => CRM_Utils_Array::value('keyColumn', $pseudoconstant),
-        'labelColumn' => CRM_Utils_Array::value('labelColumn', $pseudoconstant),
+        'keyColumn' => $pseudoconstant['keyColumn'] ?? NULL,
+        'labelColumn' => $pseudoconstant['labelColumn'] ?? NULL,
       ];
 
       // Fetch option group from option_value table
