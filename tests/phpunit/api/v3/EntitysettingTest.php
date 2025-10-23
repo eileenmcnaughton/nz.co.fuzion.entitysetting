@@ -20,7 +20,7 @@ use Civi\Test\TransactionalInterface;
  * @group headless
  */
 class api_v3_EntitySettingTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface, HookInterface, TransactionalInterface {
-  use \Civi\Test\Api3DocTrait;
+  use \Civi\Test\Api3TestTrait;
 
   protected $_apiversion = 3;
   protected $_params = [];
