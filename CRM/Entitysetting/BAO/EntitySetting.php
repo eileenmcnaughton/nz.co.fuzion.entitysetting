@@ -16,7 +16,7 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
     $instance->entity_id = $params['entity_id'];
     $instance->entity_type = $params['entity_type'];
     $instance->find(TRUE);
-    $params['setting_data'] = is_null($params['settings']) ? [] : [$params['key'] => $params['settings']];
+    $params['setting_data'] = is_null($params['settings']) ? ($params['setting_data'] ?? []) : [$params['key'] => $params['settings']];
 
     if($instance->setting_data) {
       $originalSettingData = json_decode($instance->setting_data, TRUE);
@@ -80,7 +80,7 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
       $metaDataFolders = $metadata = [];
       self::hookAlterEntitySettingsFolders($metaDataFolders);
       foreach ($metaDataFolders as $metaDataFolder) {
-        $extensionMetaData = self::loadMetaData($metaDataFolder, $entity);
+        $extensionMetaData = self::loadMetadata($metaDataFolder);
         foreach ($extensionMetaData as $entitySetting => $setting) {
           if ($entitySetting == $entity) {
             foreach ($setting as $set) {

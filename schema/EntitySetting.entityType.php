@@ -41,6 +41,7 @@ return [
       'sql_type' => 'text',
       'input_type' => 'TextArea',
       'description' => E::ts('Json Stored, Extension keyed array of data per entity'),
+      'serialize' => CRM_Core_DAO::SERIALIZE_JSON,
       'add' => '4.4',
     ],
   ],
