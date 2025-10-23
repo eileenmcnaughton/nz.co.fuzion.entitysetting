@@ -9,13 +9,19 @@
 
 namespace IvoPetkov;
 
+use IvoPetkov\HTML5DOMDocument\Internal\QuerySelectors;
+
 /**
  * Represents a live (can be manipulated) representation of a HTML5 document.
+ * 
+ * @method \IvoPetkov\HTML5DOMElement|false createElement(string $localName, string $value = '') Create new element node.
+ * @method \IvoPetkov\HTML5DOMElement|false createElementNS(?string $namespace, string $qualifiedName, string $value = '') Create new element node with an associated namespace.
+ * @method ?\IvoPetkov\HTML5DOMElement getElementById(string $elementId) Searches for an element with a certain id.
  */
 class HTML5DOMDocument extends \DOMDocument
 {
 
-    use \IvoPetkov\HTML5DOMDocument\Internal\QuerySelectors;
+    use QuerySelectors;
 
     /**
      * An option passed to loadHTML() and loadHTMLFile() to disable duplicate element IDs exception.
@@ -48,6 +54,11 @@ class HTML5DOMDocument extends \DOMDocument
     const OPTIMIZE_HEAD = 32;
 
     /**
+     * A modification (passed to modify()) that removes all but first styles with duplicate content.
+     */
+    const FIX_DUPLICATE_STYLES = 64;
+
+    /**
      *
      * @var array
      */
@@ -66,7 +77,7 @@ class HTML5DOMDocument extends \DOMDocument
      * @param string $version The version number of the document as part of the XML declaration.
      * @param string $encoding The encoding of the document as part of the XML declaration.
      */
-    public function __construct(string $version = null, string $encoding = null)
+    public function __construct(string $version = '1.0', string $encoding = '')
     {
         parent::__construct($version, $encoding);
         $this->registerNodeClass('DOMElement', '\IvoPetkov\HTML5DOMElement');
@@ -76,9 +87,10 @@ class HTML5DOMDocument extends \DOMDocument
      * Load HTML from a string.
      *
      * @param string $source The HTML code.
-     * @param int $options Additional Libxml parameters.
+     * @param integer $options Additional Libxml parameters.
      * @return boolean TRUE on success or FALSE on failure.
      */
+    #[\ReturnTypeWillChange] // While supporting PHP 7
     public function loadHTML($source, $options = 0)
     {
         // Enables libxml errors handling
@@ -96,19 +108,19 @@ class HTML5DOMDocument extends \DOMDocument
             $matches[0] = array_unique($matches[0]);
             foreach ($matches[0] as $match) {
                 if (substr($match, -2, 1) !== '/') { // check if ends with />
-                    $source = str_replace($match, $match . '<![CDATA[html5-dom-document-internal-cdata', $source);
+                    $source = str_replace($match, $match . '<![CDATA[-html5-dom-document-internal-cdata', $source); // Add CDATA after the open tag
                 }
             }
         }
-        $source = str_replace('</script>', 'html5-dom-document-internal-cdata]]></script>', $source);
-        $source = str_replace('<![CDATA[html5-dom-document-internal-cdatahtml5-dom-document-internal-cdata]]>', '', $source); // clean empty script tags
+        $source = str_replace('</script>', '-html5-dom-document-internal-cdata]]></script>', $source); // Add CDATA before the end tag
+        $source = str_replace('<![CDATA[-html5-dom-document-internal-cdata-html5-dom-document-internal-cdata]]>', '', $source); // Clean empty script tags
         $matches = null;
-        preg_match_all('/\<!\[CDATA\[html5-dom-document-internal-cdata.*?html5-dom-document-internal-cdata\]\]>/s', $source, $matches);
+        preg_match_all('/\<!\[CDATA\[-html5-dom-document-internal-cdata.*?-html5-dom-document-internal-cdata\]\]>/s', $source, $matches);
         if (isset($matches[0])) {
             $matches[0] = array_unique($matches[0]);
             foreach ($matches[0] as $match) {
                 if (strpos($match, '</') !== false) { // check if contains </
-                    $source = str_replace($match, str_replace('</', '<html5-dom-document-internal-cdata-endtagfix/', $match), $source);
+                    $source = str_replace($match, str_replace('</', '<-html5-dom-document-internal-cdata-endtagfix/', $match), $source);
                 }
             }
         }
@@ -119,13 +131,8 @@ class HTML5DOMDocument extends \DOMDocument
         $allowDuplicateIDs = ($options & self::ALLOW_DUPLICATE_IDS) !== 0;
 
         // Add body tag if missing
-        if ($autoAddHtmlAndBodyTags && $source !== '' && preg_match('/\<!DOCTYPE.*?\>/', $source) === 0 && preg_match('/\<html(\s.*?\>|\>)/', $source) === 0 && preg_match('/\<body.*?\>/', $source) === 0 && preg_match('/\<head.*?\>/', $source) === 0) {
-            $source = '<body>' . $source . '</body>';
-        }
-
-        // Add DOCTYPE if missing
-        if ($autoAddDoctype && strtoupper(substr($source, 0, 9)) !== '<!DOCTYPE') {
-            $source = "<!DOCTYPE html>\n" . $source;
+        if ($autoAddHtmlAndBodyTags && $source !== '' && preg_match('/\<!DOCTYPE.*?\>/', $source) === 0 && preg_match('/\<html.*?\>/', $source) === 0 && preg_match('/\<body.*?\>/', $source) === 0 && preg_match('/\<head.*?\>/', $source) === 0) {
+            $source = '<html><body>' . $source . '</body></html>';
         }
 
         // Adds temporary head tag
@@ -139,11 +146,11 @@ class HTML5DOMDocument extends \DOMDocument
             $source = substr($source, 0, $insertPosition) . $charsetTag . substr($source, $insertPosition);
         } else {
             $matches = [];
-            preg_match('/\<html(\s.*?\>|\>)/', $source, $matches);
+            preg_match('/\<html.*?\>/', $source, $matches);
             if (isset($matches[0])) { // has html tag
                 $source = str_replace($matches[0], $matches[0] . '<head>' . $charsetTag . '</head>', $source);
             } else {
-                $source = '<head>' . $charsetTag . '</head>' . $source;
+                $source = '<html><head>' . $charsetTag . '</head></html>' . $source;
                 $removeHtmlTag = true;
             }
             $removeHeadTag = true;
@@ -152,6 +159,11 @@ class HTML5DOMDocument extends \DOMDocument
         // Preserve html entities
         $source = preg_replace('/&([a-zA-Z]*);/', 'html5-dom-document-internal-entity1-$1-end', $source);
         $source = preg_replace('/&#([0-9]*);/', 'html5-dom-document-internal-entity2-$1-end', $source);
+
+        // Add DOCTYPE if missing
+        if ($autoAddDoctype && strtoupper(substr($source, 0, 9)) !== '<!DOCTYPE') {
+            $source = "<!DOCTYPE html>\n" . $source;
+        }
 
         $result = parent::loadHTML('<?xml encoding="utf-8" ?>' . $source, $options);
         if ($internalErrorsOptionValue === false) {
@@ -167,6 +179,7 @@ class HTML5DOMDocument extends \DOMDocument
                 break;
             }
         }
+        /** @var HTML5DOMElement|null */
         $metaTagElement = $this->getElementsByTagName('meta')->item(0);
         if ($metaTagElement !== null) {
             if ($metaTagElement->getAttribute('data-html5-dom-document-internal-attribute') === 'charset-meta') {
@@ -187,7 +200,7 @@ class HTML5DOMDocument extends \DOMDocument
             preg_match_all('/\sid[\s]*=[\s]*(["\'])(.*?)\1/', $source, $matches);
             if (!empty($matches[2]) && max(array_count_values($matches[2])) > 1) {
                 $elementIDs = [];
-                $walkChildren = function ($element) use (&$walkChildren, &$elementIDs) {
+                $walkChildren = function ($element) use (&$walkChildren, &$elementIDs): void {
                     foreach ($element->childNodes as $child) {
                         if ($child instanceof \DOMElement) {
                             if ($child->attributes->length > 0) { // Performance optimization
@@ -214,10 +227,12 @@ class HTML5DOMDocument extends \DOMDocument
 
     /**
      * Load HTML from a file.
-     *
+     * 
      * @param string $filename The path to the HTML file.
-     * @param int $options Additional Libxml parameters.
+     * @param integer $options Additional Libxml parameters.
+     * @return boolean
      */
+    #[\ReturnTypeWillChange] // While supporting PHP 7
     public function loadHTMLFile($filename, $options = 0)
     {
         return $this->loadHTML(file_get_contents($filename), $options);
@@ -286,12 +301,8 @@ class HTML5DOMDocument extends \DOMDocument
      * @param \DOMNode $node Optional parameter to output a subset of the document.
      * @return string The document (or node) HTML code as string.
      */
-    public function saveHTML(\DOMNode $node = null): string
+    public function saveHTML(?\DOMNode $node = null): string
     {
-        if (!$this->loaded) {
-            return '<!DOCTYPE html>';
-        }
-
         $nodeMode = $node !== null;
         if ($nodeMode && $node instanceof \DOMDocument) {
             $nodeMode = false;
@@ -334,6 +345,7 @@ class HTML5DOMDocument extends \DOMDocument
             }
             $html = trim($html);
         } else {
+            //$this->modify(self::OPTIMIZE_HEAD);
             $removeHtmlElement = false;
             $removeHeadElement = false;
             $headElement = $this->getElementsByTagName('head')->item(0);
@@ -372,8 +384,25 @@ class HTML5DOMDocument extends \DOMDocument
             $codeToRemove = [
                 'html5-dom-document-internal-content',
                 '<meta data-html5-dom-document-internal-attribute="charset-meta" http-equiv="content-type" content="text/html; charset=utf-8">',
-                '</area>', '</base>', '</br>', '</col>', '</command>', '</embed>', '</hr>', '</img>', '</input>', '</keygen>', '</link>', '</meta>', '</param>', '</source>', '</track>', '</wbr>',
-                '<![CDATA[html5-dom-document-internal-cdata', 'html5-dom-document-internal-cdata]]>', 'html5-dom-document-internal-cdata-endtagfix'
+                '</area>',
+                '</base>',
+                '</br>',
+                '</col>',
+                '</command>',
+                '</embed>',
+                '</hr>',
+                '</img>',
+                '</input>',
+                '</keygen>',
+                '</link>',
+                '</meta>',
+                '</param>',
+                '</source>',
+                '</track>',
+                '</wbr>',
+                '<![CDATA[-html5-dom-document-internal-cdata',
+                '-html5-dom-document-internal-cdata]]>',
+                '-html5-dom-document-internal-cdata-endtagfix'
             ];
             if ($removeHeadElement) {
                 $codeToRemove[] = '<head></head>';
@@ -391,8 +420,9 @@ class HTML5DOMDocument extends \DOMDocument
      * Dumps the internal document into a file using HTML formatting.
      * 
      * @param string $filename The path to the saved HTML document.
-     * @return int the number of bytes written or FALSE if an error occurred.
+     * @return int|false the number of bytes written or FALSE if an error occurred.
      */
+    #[\ReturnTypeWillChange] // Return type "int|false" is invalid in older supported versions.
     public function saveHTMLFile($filename)
     {
         if (!is_writable($filename)) {
@@ -476,7 +506,7 @@ class HTML5DOMDocument extends \DOMDocument
 
         $currentDomDocument = &$this;
 
-        $copyAttributes = function ($sourceNode, $targetNode) {
+        $copyAttributes = function ($sourceNode, $targetNode): void {
             foreach ($sourceNode->attributes as $attributeName => $attribute) {
                 $targetNode->setAttribute($attributeName, $attribute->value);
             }
@@ -487,7 +517,7 @@ class HTML5DOMDocument extends \DOMDocument
         $currentDomBodyElement = null;
 
         $insertTargetsList = null;
-        $prepareInsertTargetsList = function () use (&$insertTargetsList) {
+        $prepareInsertTargetsList = function () use (&$insertTargetsList): void {
             if ($insertTargetsList === null) {
                 $insertTargetsList = [];
                 $targetElements = $this->getElementsByTagName('html5-dom-document-insert-target');
@@ -565,7 +595,7 @@ class HTML5DOMDocument extends \DOMDocument
                             }
                         }
                     }
-                } else if ($target === 'beforeBodyEnd') {
+                } elseif ($target === 'beforeBodyEnd') {
                     foreach ($bodyElementChildren as $bodyElementChild) {
                         $newNode = $currentDomDocument->importNode($bodyElementChild, true);
                         if ($newNode !== null) {
@@ -602,12 +632,13 @@ class HTML5DOMDocument extends \DOMDocument
     /**
      * Applies the modifications specified to the DOM document.
      * 
-     * @param int $modifications The modifications to apply. Available values:
+     * @param integer $modifications The modifications to apply. Available values:
      *  - HTML5DOMDocument::FIX_MULTIPLE_TITLES - removes all but the last title elements.
      *  - HTML5DOMDocument::FIX_DUPLICATE_METATAGS - removes all but the last metatags with matching name or property attributes.
      *  - HTML5DOMDocument::FIX_MULTIPLE_HEADS - merges multiple head elements.
      *  - HTML5DOMDocument::FIX_MULTIPLE_BODIES - merges multiple body elements.
      *  - HTML5DOMDocument::OPTIMIZE_HEAD - moves charset metatag and title elements first.
+     *  - HTML5DOMDocument::FIX_DUPLICATE_STYLES - removes all but first styles with duplicate content.
      */
     public function modify($modifications = 0)
     {
@@ -617,7 +648,9 @@ class HTML5DOMDocument extends \DOMDocument
         $fixMultipleHeads = ($modifications & self::FIX_MULTIPLE_HEADS) !== 0;
         $fixMultipleBodies = ($modifications & self::FIX_MULTIPLE_BODIES) !== 0;
         $optimizeHead = ($modifications & self::OPTIMIZE_HEAD) !== 0;
+        $fixDuplicateStyles = ($modifications & self::FIX_DUPLICATE_STYLES) !== 0;
 
+        /** @var \DOMNodeList<HTML5DOMElement> */
         $headElements = $this->getElementsByTagName('head');
 
         if ($fixMultipleHeads) { // Merges multiple head elements.
@@ -643,7 +676,9 @@ class HTML5DOMDocument extends \DOMDocument
                 $titleTagsCount = $titleTags->length;
                 for ($i = 0; $i < $titleTagsCount - 1; $i++) {
                     $node = $titleTags->item($i);
-                    $node->parentNode->removeChild($node);
+                    if ($node !== null) { // can be null when invalid html
+                        $node->parentNode->removeChild($node);
+                    }
                 }
             }
 
@@ -691,6 +726,30 @@ class HTML5DOMDocument extends \DOMDocument
                 }
             }
 
+            if ($fixDuplicateStyles) {
+                $styles = $headElement->getElementsByTagName('style');
+                if ($styles->length > 0) {
+                    $stylesToRemove = [];
+                    $list = [];
+                    foreach ($styles as $style) {
+                        if ($style->parentNode !== $headElement) {
+                            continue;
+                        }
+                        $innerHTML = trim($style->innerHTML);
+                        if (array_search($innerHTML, $list) === false) {
+                            $list[] = $innerHTML;
+                        } else {
+                            $stylesToRemove[] = $style;
+                        }
+                    }
+                    foreach ($stylesToRemove as $styleToRemove) {
+                        $styleToRemove->parentNode->removeChild($styleToRemove);
+                    }
+                    unset($list);
+                }
+                unset($styles);
+            }
+
             if ($optimizeHead) { // Moves charset metatag and title elements first.
                 $titleElement = $headElement->getElementsByTagName('title')->item(0);
                 $hasTitleElement = false;
@@ -718,6 +777,19 @@ class HTML5DOMDocument extends \DOMDocument
                     }
                     if ($charsetMetaTag !== null && $charsetMetaTag->previousSibling !== null) {
                         $headElement->insertBefore($charsetMetaTag, $headElement->firstChild);
+                    }
+                }
+                $scriptTags = $headElement->getElementsByTagName('script');
+                if ($scriptTags->length > 0) {
+                    $nodesToMove = [];
+                    foreach ($scriptTags as $scriptTag) {
+                        if ($scriptTag->parentNode !== $headElement) {
+                            continue;
+                        }
+                        $nodesToMove[] = $scriptTag;
+                    }
+                    foreach ($nodesToMove as $nodeToMove) {
+                        $headElement->appendChild($nodeToMove);
                     }
                 }
             }

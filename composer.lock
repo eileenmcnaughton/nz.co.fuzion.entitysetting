@@ -8,25 +8,24 @@
     "packages": [
         {
             "name": "ivopetkov/html5-dom-document-php",
-            "version": "v2.2.5",
+            "version": "v2.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ivopetkov/html5-dom-document-php.git",
-                "reference": "2dceb001024f1543def2e3c772f160a83def837e"
+                "reference": "647b742aa7e10a8f4bdfe794ae7e0ef5f5029cda"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ivopetkov/html5-dom-document-php/zipball/2dceb001024f1543def2e3c772f160a83def837e",
-                "reference": "2dceb001024f1543def2e3c772f160a83def837e",
+                "url": "https://api.github.com/repos/ivopetkov/html5-dom-document-php/zipball/647b742aa7e10a8f4bdfe794ae7e0ef5f5029cda",
+                "reference": "647b742aa7e10a8f4bdfe794ae7e0ef5f5029cda",
                 "shasum": ""
             },
             "require": {
                 "ext-dom": "*",
-                "php": ">=7.0.0"
+                "php": "8.0.*|8.1.*|8.2.*|8.3.*|8.4.*"
             },
             "require-dev": {
-                "ivopetkov/docs-generator": "0.2.*",
-                "phpunit/phpunit": "6.*"
+                "ivopetkov/docs-generator": "1.*"
             },
             "type": "library",
             "autoload": {
@@ -46,7 +45,21 @@
                 }
             ],
             "description": "HTML5 DOMDocument PHP library (extends DOMDocument)",
-            "time": "2020-10-28T17:04:40+00:00"
+            "support": {
+                "issues": "https://github.com/ivopetkov/html5-dom-document-php/issues",
+                "source": "https://github.com/ivopetkov/html5-dom-document-php/tree/v2.8.1"
+            },
+            "funding": [
+                {
+                    "url": "https://www.paypal.me/ivopetkovcom",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/ivopetkov",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-06-09T11:33:50+00:00"
         }
     ],
     "packages-dev": [],
@@ -57,5 +70,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "1.1.0"
+    "plugin-api-version": "2.6.0"
 }

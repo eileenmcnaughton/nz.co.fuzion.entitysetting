@@ -121,7 +121,7 @@ class HTML5DOMTokenList
      * @param bool $force A Boolean that, if included, turns the toggle into a one way-only operation. If set to false, the token will only be removed but not added again. If set to true, the token will only be added but not removed again.
      * @return bool false if the token is not in the list after the call, or true if the token is in the list after the call.
      */
-    public function toggle(string $token, bool $force = null): bool
+    public function toggle(string $token, ?bool $force = null): bool
     {
         $this->tokenize();
         $isThereAfter = false;
@@ -219,7 +219,7 @@ class HTML5DOMTokenList
         if ($name === 'length') {
             $this->tokenize();
             return count($this->tokens);
-        } else if ($name === 'value') {
+        } elseif ($name === 'value') {
             return $this->__toString();
         }
         throw new \Exception('Undefined property: HTML5DOMTokenList::$' . $name);
@@ -239,10 +239,12 @@ class HTML5DOMTokenList
         $tokens = explode(' ', $current);
         $finals = [];
         foreach ($tokens as $token) {
-            if ($token === '')
+            if ($token === '') {
                 continue;
-            if (in_array($token, $finals))
+            }
+            if (in_array($token, $finals)) {
                 continue;
+            }
             $finals[] = $token;
         }
         $this->tokens = $finals;
