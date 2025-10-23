@@ -8,18 +8,28 @@
     <author>Eileen</author>
     <email>eileen@fuzion.co.nz</email>
   </maintainer>
-  <releaseDate>2021-03-09</releaseDate>
+  <releaseDate>2025-10-24</releaseDate>
   <urls>
     <url desc="Main Extension Page">https://github.com/eileenmcnaughton/nz.co.fuzion.entitysetting</url>
     <url desc="Support">http://forum.civicrm.org</url>
     <url desc="Licensing">http://civicrm.org/licensing</url>
     <url desc="Documentation">https://github.com/eileenmcnaughton/nz.co.fuzion.entitysetting/blob/master/README.md</url>
   </urls>
-  <version>1.4</version>
+  <version>1.5</version>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>5.45</ver>
+    <ver>5.85</ver>
   </compatibility>
+  <php_compatibility>
+    <ver>8.0</ver>
+    <ver>8.1</ver>
+    <ver>8.2</ver>
+    <ver>8.3</ver>
+    <ver>8.4</ver>
+  </php_compatibility>
+  <smarty_compatibility>
+    <ver>5</ver>
+  </smarty_compatibility>
   <comments>This extension is provided to be a 'soft' dependency for other extension. It does not provide functionality itself</comments>
   <civix>
     <namespace>CRM/Entitysetting</namespace>
@@ -34,4 +44,5 @@
     <mixin>smarty-v2@1.0.3</mixin>
     <mixin>entity-types-php@2.0.0</mixin>
   </mixins>
+
 </extension>
