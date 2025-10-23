@@ -25,7 +25,7 @@ function _civicrm_api3_entity_setting_create_spec(&$spec) {
  *
  * @param array $params
  * @return array API result descriptor
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function civicrm_api3_entity_setting_create($params) {
   return _civicrm_api3_basic_create('CRM_Entitysetting_BAO_EntitySetting', $params);
@@ -36,7 +36,7 @@ function civicrm_api3_entity_setting_create($params) {
  *
  * @param array $params
  * @return array API result descriptor
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function civicrm_api3_entity_setting_delete($params) {
   return civicrm_api3_create_success(CRM_Entitysetting_BAO_EntitySetting::del($params));
@@ -63,7 +63,7 @@ function _civicrm_api3_entity_setting_delete_spec(&$spec) {
  *
  * @param array $params
  * @return array API result descriptor
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function civicrm_api3_entity_setting_get($params) {
   $settings = _civicrm_api3_basic_get('CRM_Entitysetting_BAO_EntitySetting', $params, FALSE);
@@ -118,12 +118,12 @@ function _civicrm_api3_entity_setting_getvalue_spec(&$spec) {
  *
  * @param array $params
  * @return array API result descriptor
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function civicrm_api3_entity_setting_getsingle($params) {
   $settings = civicrm_api3_entity_setting_get($params);
   if(empty($settings['values'][$params['entity_id']])) {
-    throw new API_Exception("Expected one result found " . count($settings['values']));
+    throw new CRM_Core_Exception("Expected one result found " . count($settings['values']));
   }
   return $settings['values'][$params['entity_id']];
 }
@@ -133,12 +133,12 @@ function civicrm_api3_entity_setting_getsingle($params) {
  *
  * @param array $params
  * @return array API result descriptor
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function civicrm_api3_entity_setting_getvalue($params) {
   $settings = civicrm_api3_entity_setting_getsingle($params);
   if(!isset($settings[$params['name']])) {
-    throw new API_Exception("Setting {$params['name']} not found");
+    throw new CRM_Core_Exception("Setting {$params['name']} not found");
   }
   return ($settings[$params['name']] != '') ? $settings[$params['name']] : NULL;
 }
@@ -148,7 +148,7 @@ function civicrm_api3_entity_setting_getvalue($params) {
  *
  * @param array $params
  * @return array API result descriptor
- * @throws API_Exception
+ * @throws CRM_Core_Exception
  */
 function civicrm_api3_entity_setting_getsettings($params) {
   $settings = CRM_Entitysetting_BAO_EntitySetting::getSettings($params);

@@ -202,7 +202,7 @@ function _entitysetting_civicrm_is_admin_form_configured($formName) {
  * @param string $formName Name of form
  *
  * @return array
- * @throws \CiviCRM_API3_Exception
+ * @throws \CRM_Core_Exception
  */
 function _entitysetting_civicrm_get_form_settings($formName) {
   $adminForms = _entitysetting_civicrm_get_entity_form_mappings();
