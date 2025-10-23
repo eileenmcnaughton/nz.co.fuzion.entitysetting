@@ -104,7 +104,7 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
  */
   public static function getSettings($params) {
     $settings = self::getSettingSpecification($params['entity']);
-    return CRM_Utils_Array::value($params['entity'], $settings, []);
+    return $settings[$params['entity']] ?? [];
   }
 
   /**
@@ -143,7 +143,7 @@ class CRM_Entitysetting_BAO_EntitySetting extends CRM_Entitysetting_DAO_EntitySe
       $pseudoconstant = $fieldSpec['pseudoconstant'];
       // Merge params with schema defaults
       $params += [
-        'condition' => CRM_Utils_Array::value('condition', $pseudoconstant, []),
+        'condition' => $pseudoconstant['condition'] ?? [],
         'keyColumn' => $pseudoconstant['keyColumn'] ?? NULL,
         'labelColumn' => $pseudoconstant['labelColumn'] ?? NULL,
       ];

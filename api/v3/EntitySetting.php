@@ -69,7 +69,7 @@ function civicrm_api3_entity_setting_get($params) {
   $settings = _civicrm_api3_basic_get('CRM_Entitysetting_BAO_EntitySetting', $params, FALSE);
   $settings = reset($settings);
   $settings = json_decode($settings['setting_data'], TRUE);
-  return civicrm_api3_create_success([$params['entity_id'] => CRM_Utils_Array::value($params['key'], $settings, [])]);
+  return civicrm_api3_create_success([$params['entity_id'] => $settings[$params['key']] ?? []]);
 }
 
 /**
