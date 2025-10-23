@@ -237,10 +237,3 @@ function _entity_civicrm_set_form_defaults(&$form, $setting, $entity_id, $formKe
     // don't set the default
   }
 }
-
-/**
- * Implements hook_civicrm_entityTypes.
- *
- * @param array $entityTypes
- *   Registered entity types.
- */
