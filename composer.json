@@ -1,5 +1,6 @@
 {
     "name": "eileenmcnaughton/nz.co.fuzion.entitysetting",
+    "type": "civi-ext",
     "description": "This module provides a mechanism for managing settings associated with CiviCRM entities without a table per setting",
     "require": {
         "ivopetkov/html5-dom-document-php": "^2.2"
